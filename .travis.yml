@@ -1,16 +1,21 @@
 language: android
 
 jdk:
-    - oraclejdk8
+  - oraclejdk8
 
 android:
   components:
     - tools
-    - build-tools-24.0.1
-    - android-24
-    - extra-android-m2repository
-    - extra-google-m2repository
-    - extra-android-support
+    - tools
+    - build-tools-28.0.3
+    - platform-tools
+
+before_script:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+
+before_install:
+  - yes | sdkmanager "platforms;android-28"
 
 notifications:
     email:
@@ -20,11 +25,12 @@ cache: false
 sudo: false
 
 install:
-    # Ensure Gradle wrapper is executable, download wrapper and show version
     - chmod +x ./gradlew; ls -l gradlew; ./gradlew wrapper -v
 
-    # Download and show android dependencies
-    # - ./gradlew androidDependencies
-
 script:
-    - ./gradlew library:check library:assemble
+  - ./gradlew clean build lint assemble
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle
